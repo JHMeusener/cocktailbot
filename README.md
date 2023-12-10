@@ -2,7 +2,7 @@
 WIO Terminal based cocktail mixing robot
 
 
-Untested as of now.
+Untested as of now. (still building the hardware)
 
 Delivers a signal to relais or mosfets to drive up to 11 (or more, if you adjust the code) peristaltic pumps - up to 3 are active at the same time (Can be adjusted in Code, depends on the current your power source can deliver). The flow is monitored for empty-bottle or other fail-detection (untested). Also the content of each flask is estimated (but nothing happens with this info yet).
 
