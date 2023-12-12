@@ -30,6 +30,7 @@ void setup() {
   pinMode(WIO_BUZZER, OUTPUT); //set buzzer pin as output        12
   for (int i = 0; i<11; i++){
     pumpen[i].pinNr = pumpenPins[i];
+    pinMode(pumpenPins[i], OUTPUT);
   }
 
   tft.begin(); //start TFT LCD
