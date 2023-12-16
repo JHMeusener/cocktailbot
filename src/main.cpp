@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include "StateMachine.h"
 #include "Pumpe.h"
-
+#include "ConfigAndCommons.h"
 bool debug = false;
 
-Pumpe p = Pumpe();
+
 TFT_eSPI tft;
 HX711_ADC LoadCell(HX711_dout, HX711_sck);
 
@@ -17,6 +17,16 @@ Barbot_StateMachine bot = Barbot_StateMachine();
 bool mock = false;
 
 void setup() {
+  //switch all pumps off
+  for (int i = 0; i<11; i++){
+    pumpen[i].pinNr = pumpenPins[i];
+    pumpen[i].pumpNr = i;
+    pinMode(pumpenPins[i], OUTPUT);
+    pumpen[i].writeLow_();
+  }
+
+
+
   Serial.begin(115200);
   if (!mock){LoadCell.begin();}
   pinMode(WIO_KEY_A, INPUT); //set button A pin as input         28
@@ -28,10 +38,7 @@ void setup() {
   pinMode(WIO_5S_RIGHT, INPUT); //set switch pin right as input  33
   pinMode(WIO_5S_PRESS, INPUT); //set switch pin press as input  35
   pinMode(WIO_BUZZER, OUTPUT); //set buzzer pin as output        12
-  for (int i = 0; i<11; i++){
-    pumpen[i].pinNr = pumpenPins[i];
-    pinMode(pumpenPins[i], OUTPUT);
-  }
+  
 
   tft.begin(); //start TFT LCD
   tft.setRotation(3); //set screen rotation 
@@ -62,13 +69,17 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   overlayWrite("loading Flasks");
   for (int i=0;i<11;i++){
-    flaschen[i].parseFlasche(String(i));
+    if(flaschen[i].parseFlasche(String(i+1))){
+        nrOfFlasks++;
+    }
     tft.setCursor(5,5+i*10);
   }
   
   overlayWrite("loading Recipes");
   for (int i=0;i<35;i++){
-    rezepte[i].parseRezept(String(i));
+    if(rezepte[i].parseRezept(String(i+1))){
+        nrOfRecipes++;
+    }
   }
   delay(500);
   tft.fillScreen(TFT_BLACK);

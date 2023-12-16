@@ -5,7 +5,7 @@
 #include "SD/Seeed_SD.h"
 #include "UI_globals.h"
 #include "Pumpe.h"
-
+#include "ConfigAndCommons.h"
 
 extern TFT_eSPI tft; //initialize TFT LCD
 enum STATE_BOT{boot, home, browseRezept, prepareRezept, doRezept, endRezept, browseFlask_ml, browseFlask_seconds, showTxtExpectations};

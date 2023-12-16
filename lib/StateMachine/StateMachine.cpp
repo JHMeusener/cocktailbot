@@ -1,9 +1,12 @@
-#include <StateMachine.h>
+#include "StateMachine.h"
 
 void Barbot_StateMachine::loopAll(){
   if (LoadCell.update()){ 
       currentWeight = LoadCell.getData();
-      Serial.println(currentWeight);
+      if (cfg.loadCellFlipped){
+        currentWeight = -currentWeight;
+      }
+      //Serial.println(currentWeight);
   }
   Pumpe::pumpLoop(currentWeight);
 };
@@ -35,13 +38,13 @@ void Barbot_StateMachine::startBrowseRezept(){
 void Barbot_StateMachine::loopBrowseRezept(){
     if (digitalRead(WIO_5S_LEFT)==LOW){
       currentRezeptNr = currentRezeptNr-1;
-      if (currentRezeptNr <0){currentRezeptNr=rezepteMax-1;}
+      if (currentRezeptNr <0){currentRezeptNr=nrOfRecipes-1;}
       startChooseRecipe_UI(currentRezeptNr);
       delay(200);
       return;
     }
     if (digitalRead(WIO_5S_RIGHT)==LOW){
-      currentRezeptNr = (currentRezeptNr+1)%rezepteMax;
+      currentRezeptNr = (currentRezeptNr+1)%nrOfRecipes;
       startChooseRecipe_UI(currentRezeptNr);
       delay(200);
       return;
@@ -275,14 +278,14 @@ void Barbot_StateMachine::loopBrowseFlask_ml(){
     delay(200);
   }
   if (digitalRead(WIO_5S_RIGHT)==LOW){
-    currentFlaskNr = (currentFlaskNr+1)%11;
+    currentFlaskNr = (currentFlaskNr+1)%nrOfFlasks;
     startFlask_ml_UI(currentFlaskNr, ml_Target);
     delay(200);
   }
   if (digitalRead(WIO_5S_LEFT)==LOW){
     currentFlaskNr = currentFlaskNr-1;
     if (currentFlaskNr < 0){
-      currentFlaskNr = 10;
+      currentFlaskNr = nrOfFlasks-1;
     }
     startFlask_ml_UI(currentFlaskNr, ml_Target);
     if (debug){tft.drawString("flow "+String(pumpen[currentFlaskNr].calibratedFlowTarget),110,110);}
@@ -338,14 +341,14 @@ void Barbot_StateMachine::loopBrowseFlask_seconds(){
     delay(200);
   }
   if (digitalRead(WIO_5S_RIGHT)==LOW){
-    currentFlaskNr = (currentFlaskNr+1)%11;
+    currentFlaskNr = (currentFlaskNr+1)%nrOfFlasks;
     startFlask_seconds_UI(currentFlaskNr, int(float(ms_Target)/1000.f));
     delay(200);
   }
   if (digitalRead(WIO_5S_LEFT)==LOW){
     currentFlaskNr = currentFlaskNr-1;
     if (currentFlaskNr < 0){
-      currentFlaskNr = 10;
+      currentFlaskNr = nrOfFlasks-1;
     }
     startFlask_seconds_UI(currentFlaskNr, int(float(ms_Target)/1000.f));
     delay(200);

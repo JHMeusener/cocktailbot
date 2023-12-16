@@ -84,7 +84,7 @@ void startChooseRecipe_UI(int recipeNr){
   tft.drawString(String(rezepte[recipeNr].shortText1).substring(0,rezepte[recipeNr].shortTextLength1),10,90); //draw text string 
   tft.drawString(String(rezepte[recipeNr].shortText2).substring(0,rezepte[recipeNr].shortTextLength2),10,130); //draw text string 
   tft.drawString(String(rezepte[recipeNr].shortText3).substring(0,rezepte[recipeNr].shortTextLength3),10,170); //draw text string 
-  tft.drawString("Nr "+String(recipeNr+1)+" von "+String(rezepteMax),40,210); //draw text string 
+  tft.drawString("Nr "+String(recipeNr+1)+" von "+String(nrOfRecipes),40,210); //draw text string 
   return;
 };
 
@@ -292,16 +292,16 @@ void showExpectiations_UI(int page){
   switch (page){
       case 0:
           tft.drawString("Filesystem",50,10);
-          tft.drawString("rezept0.txt",5,40);
+          tft.drawString("rezept1.txt",5,40);
           tft.drawString("...",15,60);
-          tft.drawString("rezept34.txt   <- mindestens 1",5,80);
-          tft.drawString("flasche0.txt",5,120);
+          tft.drawString("rezept35.txt   <- mindestens 1",5,80);
+          tft.drawString("flasche1.txt",5,120);
           tft.drawString("...",15,140);
-          tft.drawString("flasche10.txt   <- alle 11",5,160);
+          tft.drawString("flasche11.txt   <- mindestens 1",5,160);
           tft.drawString("pumpenMLperSecond.txt  <- muss",5,200);
           break;
       case 1:
-          tft.drawString("rezept0.txt",50,10);
+          tft.drawString("rezept1.txt",50,10);
           tft.drawString("Tequila Sunrise  # name",5,40);
           tft.drawString("leckerer Cocktail  # beschreibung 1",5,60);
           tft.drawString("mit O-Saft  # beschreibung 2",5,80);
@@ -313,7 +313,7 @@ void showExpectiations_UI(int page){
           tft.drawString("Limettensaft-5  # flaskname-ml",5,200);
           break;
       case 2:
-          tft.drawString("flasche0.txt",50,10);
+          tft.drawString("flasche1.txt",50,10);
           tft.drawString("Tequila # name",5,40);
           tft.drawString("750 # fassungsvermoegen der Flasch in mL ",5,60);
           tft.drawString("250 # aktuelle Fuellung in ml ",5,80);
@@ -331,7 +331,7 @@ void showExpectiations_UI(int page){
           tft.drawString("PINS",50,10);
           tft.drawString("HX711_dout 3  HX711_sck 5",5,40);
           tft.drawString("Pumppins",5,60);
-          tft.drawString("7 11 13 15 19 21 23 27 37 16 18",5,80);
+          tft.drawString("11 13 15 19 21 23 27 37 16 18 7",5,80);
           break;
       case 5:
           break;

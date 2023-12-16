@@ -3,9 +3,10 @@ void Pumpe::start(){
       if (running){ return;}
       currentRunningNr = currentRunningNr+1;
       running = true;
-      digitalWrite(pinNr, HIGH);
+      writeHigh_();
       lastStarted = millis();
       lastPumpTimeUpdate = millis();
+      lastPumpStarted = millis();
     };
 
 void Pumpe::stop(){
@@ -14,7 +15,7 @@ void Pumpe::stop(){
       currentRunningNr = currentRunningNr-1;
       
       if (fabs(currentFlowTarget)<0.01f){currentFlowTarget = 0.f;}
-      digitalWrite(pinNr, LOW);
+      writeLow_();
       running = false;
       lastStopped = millis();
       lastPumpStopped = millis();
@@ -24,6 +25,26 @@ void Pumpe::stop(){
       }
       lastPumpStopped = lastStopped;
     };
+
+void Pumpe::writeHigh_(){
+  if (cfg.pumpLogicInverted[pumpNr]){
+    digitalWrite(pinNr, LOW);
+  }
+  else {
+    digitalWrite(pinNr, HIGH);
+  }
+  return;
+
+};
+void Pumpe::writeLow_(){
+  if (cfg.pumpLogicInverted[pumpNr]){
+    digitalWrite(pinNr, HIGH);
+  }
+  else {
+    digitalWrite(pinNr, LOW);
+  }
+  return;
+};
 
 void Pumpe::updatePumpTimes(){
       if (!running){ 
@@ -78,7 +99,7 @@ void Pumpe::flowProblemRectification(){
             continue;
           }
 
-          if (flowProblemEnded-pumpen[i].lastStopped > 3000){
+          if (flowProblemEnded-pumpen[i].lastStopped > (cfg.msWaitShutoffFlowProblem+500)){
             pumpen[i].mayBeFlowProblem = false;
             pumpen[i].pumpedUnderFlowProblem = 0;
             pumpen[i].PumpedUnderFlowProblem_problem = 0;
@@ -138,7 +159,7 @@ void Pumpe::pumpStart_recipe(float currentMeasuredWeight, bool resetProblem){
           }
           pumpen[i].updatePumpTimes();
         }
-      maxRunningNr = 3;
+      maxRunningNr = cfg.maxPumpsRunning;
       flowProblem = false;
       if ( ms_all == 0){
         donePumping = true;
@@ -194,10 +215,10 @@ void Pumpe::pumpLoop(float currentMeasuredWeight){
             float currentMeasuredFlow = currentMeasuredWeightDT/currentMeasuredFlowDT;
             lastMeasurementTime = millis();
             lastMeasurementValue = currentMeasuredWeight;
-            measurementFlowAverage = measurementFlowAverage*0.7f + 0.3f * currentMeasuredFlow;
-            flowTargetAverage = flowTargetAverage*0.7f + 0.3f*currentFlowTarget;
+            measurementFlowAverage = measurementFlowAverage*(1.f-cfg.newFlowMeasurementWeight) + cfg.newFlowMeasurementWeight * currentMeasuredFlow;
+            flowTargetAverage = flowTargetAverage*(1.f-cfg.newFlowMeasurementWeight) + cfg.newFlowMeasurementWeight*currentFlowTarget;
             float discepancy = measurementFlowAverage-flowTargetAverage;
-            flowDiscrepancyAverage = flowDiscrepancyAverage*0.7f + 0.3f*discepancy;
+            flowDiscrepancyAverage = flowDiscrepancyAverage*(1.f-cfg.newFlowMeasurementWeight) + cfg.newFlowMeasurementWeight*discepancy;
             drawOverlay("Flow:"+String(measurementFlowAverage), 5, 5);
             drawOverlay("trgt:"+String(flowTargetAverage), 75, 5);
             drawOverlay("disc:"+String(flowDiscrepancyAverage), 150, 5);
@@ -207,7 +228,7 @@ void Pumpe::pumpLoop(float currentMeasuredWeight){
         }   
         
         //check for FlowProblem existence
-        if (fabs(flowDiscrepancyAverage) < pumpen[0].calibratedFlowTarget*0.5f){
+        if (fabs(flowDiscrepancyAverage) < pumpen[0].calibratedFlowTarget*cfg.flowProblemThreshold){
           //no flow Problem
           if (flowProblem){
             flowProblemRectification();
@@ -255,38 +276,40 @@ void Pumpe::pumpLoop(float currentMeasuredWeight){
 
         if (!flowProblem){
             //NORMAL FLOW: check if pumps can be switched on
-            if (currentRunningNr < maxRunningNr){
-                drawOverlay("can start pump", 210, 50);
-                int highestMsTargetRemaining = 0;
-                int pumpNrHighest = 0;
+            if (millis()-lastPumpStarted > cfg.msWaitStartNextPump){
+              if (currentRunningNr < maxRunningNr){
+                  drawOverlay("can start pump", 210, 50);
+                  int highestMsTargetRemaining = 0;
+                  int pumpNrHighest = 0;
 
-                int highestMsTargetRemaining_notPumping = 0;
-                int pumpNrHighest_notPumping = 0;
+                  int highestMsTargetRemaining_notPumping = 0;
+                  int pumpNrHighest_notPumping = 0;
 
-                for (int i=0; i<11; i++){
-                  if ((pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs) > highestMsTargetRemaining){
-                    highestMsTargetRemaining = pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs;
-                    pumpNrHighest = i;
-                  }
-                  if (!pumpen[i].running){
-                    if ((pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs) > highestMsTargetRemaining_notPumping){
-                      highestMsTargetRemaining_notPumping = pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs;
-                      pumpNrHighest_notPumping = i;
+                  for (int i=0; i<11; i++){
+                    if ((pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs) > highestMsTargetRemaining){
+                      highestMsTargetRemaining = pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs;
+                      pumpNrHighest = i;
                     }
+                    if (!pumpen[i].running){
+                      if ((pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs) > highestMsTargetRemaining_notPumping){
+                        highestMsTargetRemaining_notPumping = pumpen[i].runtimeTarget_ms - pumpen[i].pumpedMs;
+                        pumpNrHighest_notPumping = i;
+                      }
+                    }
+                  };
+                  if (highestMsTargetRemaining < 1){
+                      donePumping = true;
+                      return;
                   }
-                };
-                if (highestMsTargetRemaining < 1){
-                    donePumping = true;
-                    return;
-                }
-                if (highestMsTargetRemaining_notPumping > 0){
-                    pumpen[pumpNrHighest_notPumping].start();
-                }
+                  if (highestMsTargetRemaining_notPumping > 0){
+                      pumpen[pumpNrHighest_notPumping].start();
+                  }
+              }
             }
         }
       else {
           //FLOWPROBLEM PRESENT: check if pumps can be switched off
-          if (millis()-lastPumpStopped > 2000){
+          if (millis()-lastPumpStopped > cfg.msWaitShutoffFlowProblem){
             if (currentRunningNr > 0){
                 int lowestRemainingTime = 99999;
                 int lowestRemainingTimePumpNr = 0;
@@ -340,9 +363,12 @@ void Pumpe::pause(){
     };
 
 void Pumpe::resume(){
-      maxRunningNr = 3;
+      maxRunningNr = cfg.maxPumpsRunning;
       donePumping = false;
     };
+
+
+unsigned long lastPumpStarted = 0;
 
 float calibrationValue = 696.0;// calibration value (see example file "Calibration.ino")
 void Pumpe::parsePumpen(){
@@ -382,7 +408,7 @@ void Pumpe::parsePumpen(){
 
 
 int currentRunningNr = 0;
-int maxRunningNr = 3;
+int maxRunningNr = cfg.maxPumpsRunning;
 float currentFlowTarget = 0;
 bool flowProblem = 0;
 unsigned long flowProblemBegan = 0;

@@ -14,7 +14,7 @@ class Flasche{
     char name[15] = {};
     int nameLength = 0;
     
-    void parseFlasche(String filename);
+    bool parseFlasche(String filename);
 
 };
 
@@ -35,11 +35,10 @@ class Rezept{
     int shortTextLength3 = 0;
     int endTextLength1 = 0;
     int endTextLength2 = 0;
-    float schritt[3][12] = {};
+    float schritt[3][12] = {}; //maxpumps + dummy
     
-    void parseRezept(String filename);
+    bool parseRezept(String filename);
 };
 
 
 extern Rezept rezepte[35];
-extern int rezepteMax;

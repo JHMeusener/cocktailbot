@@ -1,5 +1,6 @@
 #include <storageClasses.h>
-void Flasche::parseFlasche(String filename){
+bool Flasche::parseFlasche(String filename){
+        bool flaskOk = false;
         File myFile = SD.open("flasche"+filename+".txt"); // open the file for reading
         if (myFile) { 
           overlayWrite("flasche"+filename+".txt");
@@ -16,6 +17,7 @@ void Flasche::parseFlasche(String filename){
                 name[i] = line[i];
               }
               nameLength = line.length();
+              flaskOk = true;
               tft.print("name: ");overlayWrite(String(name).substring(0,nameLength)+"#end");
             }
 
@@ -33,9 +35,12 @@ void Flasche::parseFlasche(String filename){
         else {
           overlayWrite("missing:");
           overlayWrite("flasche"+filename+".txt");
-          delay(2000);
-          loadError = true;
+          delay(200);
+          if (filename == "1"){
+            loadError = true;
+          }
         }
+        return flaskOk;
     };
 
 
@@ -45,8 +50,9 @@ void Flasche::parseFlasche(String filename){
 Flasche flaschen[12] = {};
 
 
-void Rezept::parseRezept(String filename){
+bool Rezept::parseRezept(String filename){
         File myFile = SD.open("rezept"+filename+".txt"); // open the file for reading
+        bool recipeOK = false;
         if (myFile) { 
           overlayWrite("found rezept"+filename+".txt");
           int schrittNr = 0;
@@ -133,6 +139,7 @@ void Rezept::parseRezept(String filename){
                     }
                   }
                   if (ok){
+                      recipeOK = true;
                       correctFlaskFound = true;
                       overlayWrite("zutat: "+String(flaschen[flaschenNr].name).substring(0,flaschen[flaschenNr].nameLength)+" "+String(value));
                       schritt[schrittNr][flaschenNr] = value;
@@ -146,20 +153,19 @@ void Rezept::parseRezept(String filename){
             }
           }
           myFile.close(); //close file
-          rezepteMax++;
         }
         else {
           overlayWrite("missing:");
           overlayWrite("rezept"+filename+".txt");
           delay(100);
-          if (filename == "0"){
+          if (filename == "1"){
             loadError = true;
           }
         }
+        return recipeOK;
     };
 
 
 
 
 Rezept rezepte[35] = {};
-int rezepteMax = 0;

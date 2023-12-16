@@ -5,7 +5,7 @@
 #include "SD/Seeed_SD.h"
 #include "storageClasses.h"
 #include "UI_globals.h"
-
+#include "ConfigAndCommons.h"
 
 class Pumpe{
   public:
@@ -19,6 +19,7 @@ class Pumpe{
     long pumpedUnderFlowProblem = 0;
     bool mayBeFlowProblem = false; 
     int pinNr = 0;
+    int pumpNr = 0;
     long PumpedUnderFlowProblem_problem = 0;
 
     unsigned long lastPumpTimeUpdate = 0;
@@ -26,6 +27,9 @@ class Pumpe{
     float calibratedFlowTarget = 0.f;
 
     void start();
+
+    void writeHigh_();
+    void writeLow_();
 
     void stop();
 
@@ -79,4 +83,5 @@ extern Pumpe pumpen[11];
 extern float flowDiscrepancyAtProblemStart;
 extern bool donePumping;
 extern unsigned long lastPumpStopped;
+extern unsigned long lastPumpStarted;
 extern float calibrationValue;// = 696.0;; // calibration value (see example file "Calibration.ino")
