@@ -55,4 +55,5 @@ extern void drawBar(float percent);
 
 extern bool loadError;
 extern void tare();
+extern bool tareFlag;
 extern void showExpectiations_UI(int page);

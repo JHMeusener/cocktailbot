@@ -26,8 +26,8 @@
 class Barbot_Config{
     public:
       bool loadCellFlipped = true;
-      bool pumpLogicInverted[11] = {true,true,false,true,false,true,true,true,true,true, true};
-      int msWaitShutoffFlowProblem = 800;
+      bool pumpLogicInverted[11] = {true,true,false,false,false,true,true,true,true,true, true};
+      int msWaitShutoffFlowProblem = 2000;
       int msWaitStartNextPump = 800;
       int maxPumpsRunning = 3;
       float newFlowMeasurementWeight = 0.3;

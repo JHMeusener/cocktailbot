@@ -173,7 +173,7 @@ void Pumpe::pumpStart_blind(float pumpML, float pumpMS, int pumpNr){
       
       for (int i=0; i<11; i++){
         if (i == pumpNr){
-          digitalWrite(pumpen[i].pinNr,HIGH);
+          pumpen[i].writeHigh_();
           if (pumpMS > 0){
             singleTargetMS = pumpMS;
             flaschen[pumpNr].fluessigkeit_schaetzung = flaschen[pumpNr].fluessigkeit_schaetzung-(pumpMS*pumpen[pumpNr].calibratedFlowTarget /1000.f);
@@ -189,8 +189,7 @@ void Pumpe::pumpStart_blind(float pumpML, float pumpMS, int pumpNr){
 void Pumpe::_pumpLoop_blind(){
       if (millis()-singleStarted > singleTargetMS){
         for (int i= 0; i<11;i++){
-          
-          digitalWrite(pumpen[i].pinNr,LOW);
+          pumpen[i].writeLow_();
           overlayWrite("pump_blind ended");
         }
         blindPumping = false;
@@ -358,7 +357,7 @@ void Pumpe::pause(){
       for (int i= 0; i<11;i++){
           
           pumpen[i].stop();
-          digitalWrite(pumpen[i].pinNr,LOW);
+          pumpen[i].writeLow_();
       }
     };
 

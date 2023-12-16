@@ -3,13 +3,20 @@
 void Barbot_StateMachine::loopAll(){
   if (LoadCell.update()){ 
       currentWeight = LoadCell.getData();
+      if (tareFlag){
+        tareFlag=false;
+        zeroWeight_tare = currentWeight;
+      }
+      currentWeight = currentWeight-zeroWeight_tare;
       if (cfg.loadCellFlipped){
         currentWeight = -currentWeight;
-      }
+      };
       //Serial.println(currentWeight);
-  }
+  };
   Pumpe::pumpLoop(currentWeight);
+  return;
 };
+
 void Barbot_StateMachine::loopBoot(){
   startHome();
   return;
@@ -18,16 +25,27 @@ void Barbot_StateMachine::loopBoot(){
 void Barbot_StateMachine::startHome(){
     state = home;
     startHome_UI();
+    lastWeightWasNonZero = millis();
     return;
 };
 void Barbot_StateMachine::loopHome(){
     loopAll();
-    if (currentWeight > 10.f){
-      startBrowseRezept();
-    }
-    if (currentWeight < 2.f){
+    if (currentWeight < (-2.f)){
       tare();
     };
+    if(fabs(currentWeight)<0.0001f){
+      if(millis()-lastWeightWasNonZero>1000){
+        tft.drawString("Check LoadCell!",50,150);
+      }
+    }
+    else{
+      lastWeightWasNonZero = millis();
+    }
+    
+    if (currentWeight > 10.f){
+      startBrowseRezept();
+    };
+    
     return;
 };
 void Barbot_StateMachine::startBrowseRezept(){
@@ -61,6 +79,7 @@ void Barbot_StateMachine::loopBrowseRezept(){
     };
     if (currentWeight < 10.f){
       startHome();
+      return;
     };
     if (digitalRead(WIO_5S_PRESS)==LOW){
       startPrepareRezept();
@@ -261,6 +280,10 @@ void Barbot_StateMachine::loopBrowseFlask_ml(){
     displayTime = millis();
     redrawWeight_UI(currentWeight);
   }
+  if (currentWeight < 10.f){
+      startHome();
+      return;
+    };
   if (digitalRead(WIO_5S_DOWN)==LOW){
     ml_Target = ml_Target-5;
     if (ml_Target < 5){
@@ -319,7 +342,10 @@ void Barbot_StateMachine::startBrowseFlask_seconds(){
   return;
 };
 void Barbot_StateMachine::loopBrowseFlask_seconds(){
-
+  if (currentWeight < 10.f){
+      startHome();
+      return;
+    };
     if(millis()-displayTime > 200){
     displayTime = millis();
     redrawWeight_UI(currentWeight);

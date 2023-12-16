@@ -35,8 +35,9 @@ class Barbot_StateMachine{
     int displayStep = 0;
     bool displayingOld = false;
     int expectationPage = 0;
+    float zeroWeight_tare = 0.f;
     unsigned long lastScaleUpdate = 0;
-
+    unsigned long lastWeightWasNonZero = 0;
     void loopAll();
     void loopBoot();
     void startHome();

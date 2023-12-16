@@ -222,6 +222,11 @@ void drawBar(float percent){
   return;
 };
 
+bool tareFlag = false;
+void tare(){
+  tareFlag=true;
+}
+
 bool flowProblem_b = false;
 void startFlowProblem_UI(){
   flowProblem_b = true;
@@ -235,15 +240,6 @@ void endFlowProblem_UI(){
   tft.fillRect(30, 160, 260, 20, TFT_WHITE);
   tft.fillRect(10, 140, int(300.f*lastPercent/100.f), 60, TFT_NAVY);
 };
-
-
-void tare(){
-  LoadCell.tareNoDelay();
-  while(!LoadCell.getTareStatus()){
-
-  }
-  return;
-}
 
 
 void startEndRecipe_UI(int recipeNr, String extraText1, String extraText2){
