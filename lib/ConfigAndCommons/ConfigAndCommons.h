@@ -18,6 +18,8 @@
 #define FLPIN_9 BCM23
 #define FLPIN_10 BCM24
 #define FLPIN_11 BCM4
+
+#define PIN_MASTER12 WIO_IR
 //pins: 11 13 15 19 21 23 27 37 16 18 7
 //blocked by buttons: 28, 29, 30, 31, 32, 33, 34, 35, 12
 
@@ -26,10 +28,10 @@
 class Barbot_Config{
     public:
       bool loadCellFlipped = true;
-      bool pumpLogicInverted[11] = {true,true,false,false,false,true,true,true,true,true, true};
+      bool pumpLogicInverted[11] = {true,true,false,false,true,true,true,true,false,true, true};
       int msWaitShutoffFlowProblem = 2000;
       int msWaitStartNextPump = 800;
-      int maxPumpsRunning = 3;
+      int maxPumpsRunning = 4;
       float newFlowMeasurementWeight = 0.3;
       float flowProblemThreshold = 0.5;
 };

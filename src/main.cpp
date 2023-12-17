@@ -24,8 +24,8 @@ void setup() {
     pinMode(pumpenPins[i], OUTPUT);
     pumpen[i].writeLow_();
   }
-
-
+  pinMode(PIN_MASTER12,OUTPUT);
+  digitalWrite(PIN_MASTER12,LOW);
 
   Serial.begin(115200);
   if (!mock){LoadCell.begin();}
@@ -99,6 +99,7 @@ void setup() {
         }
   }
   else {
+    digitalWrite(PIN_MASTER12,HIGH);
     bot.startHome();
   }
 }

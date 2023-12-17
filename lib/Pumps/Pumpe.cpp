@@ -386,7 +386,7 @@ void Pumpe::parsePumpen(){
               if (lineNr > 0){
                 pumpen[lineNr-1].calibratedFlowTarget = line.toFloat();
               }
-              if (lineNr == calibrationValue){
+              if (lineNr == 0){
                 calibrationValue = line.toFloat();
               }
               
